@@ -1,30 +1,63 @@
 ---
-title: "Untitled"
+title: "ST 558 Project 1"
 author: "Kristi Ramey"
 date: "9/23/2021"
-output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+## Library needed:
+```{r message=FALSE, warning=FALSE}
 
-## R Markdown
+#Packages needed:
+#install.packages("httr")
+#install.packages("jsonlite")
+#Libraries needed:
+library(tidyverse)
+library(httr)
+library(jsonlite)
+```
+Connect to Pokemon API
+```{r message=FALSE, warning=FALSE}
+pokemondumpBLUE <- GET("https://pokeapi.co/api/v2/pokemon-color/blue/")
+pokemondumpMALE <- GET("https://pokeapi.co/api/v2/gender/male/")
+pokemondumpFEMALE <- GET("https://pokeapi.co/api/v2/gender/female/")
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Try to make sense of what info is given
+pokemon_blue <- fromJSON(pokemondumpBLUE$url)
+pokemon_male <- fromJSON(pokemondumpMALE$url)
+pokemon_female <- fromJSON(pokemondumpFEMALE$url)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+df_pokemon_blue <- pokemon_blue$pokemon_species[1]
+# Number of Blue Pokemon
+numb_blue <- nrow(df_pokemon_blue)
+numb_blue
 
-```{r cars}
-summary(cars)
+# Create a function to get a list of Pokemon of a certain color
+color_FUN <- function(color){  
+  base <- c("https://pokeapi.co/api/v2/pokemon-color/")
+  color <- c(color)  
+  slash <- c("/")
+  api_color <- paste0(base, color, slash)
+}
+```
+  pokemon_color <- fromJSON(api_color$url)
+  df_pokemon_color <- pokemon_color$pokemon_species[1]
+  return(df_pokemon_color)
+  
+  
+  
+}
+
+test <- color_FUN(color = "blue")
+test
 ```
 
-## Including Plots
+pokemon_
+## Pokemon data:
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Pokemon data: https://pokeapi.co/
+Render:
+change input and output
+rmarkdown::render(input = '_Rmd/2021-9-13-R-post.rmd', output_format = 'github_document', output_options = list(  keep_html = FALSE), output_dir = '_posts/')
