@@ -23,24 +23,41 @@ Connect to Pokemon API
 pokemondumpBLUE <- GET("https://pokeapi.co/api/v2/pokemon-color/blue/")
 pokemondumpMALE <- GET("https://pokeapi.co/api/v2/gender/male/")
 pokemondumpFEMALE <- GET("https://pokeapi.co/api/v2/gender/female/")
+pokemondumpEVOLVE <- GET("https://pokeapi.co/api/v2/evolution-chain/1/")
+pokemondumpNAME <- GET("https://pokeapi.co/api/v2/")
 
 # Try to make sense of what info is given
 pokemon_blue <- fromJSON(pokemondumpBLUE$url)
 pokemon_male <- fromJSON(pokemondumpMALE$url)
 pokemon_female <- fromJSON(pokemondumpFEMALE$url)
+pokemon_evolve <- fromJSON(pokemondumpEVOLVE$url)
+pokemon_name <- fromJSON(pokemondumpNAME$url)
+
+id <- pokemon_evolve$chain$species$name
+name <- pokemon_name
+name
 
 df_pokemon_blue <- pokemon_blue$pokemon_species[1]
 # Number of Blue Pokemon
 numb_blue <- nrow(df_pokemon_blue)
 numb_blue
+```
 
-# Create a function to get a list of Pokemon of a certain color
+
+
+```{r message=FALSE, warning=FALSE}
+# Create a function to get the number of Pokemon of a certain color
 color_FUN <- function(color){  
   base <- c("https://pokeapi.co/api/v2/pokemon-color/")
   color <- c(color)  
   slash <- c("/")
   api_color <- paste0(base, color, slash)
+  pokemon_color <- fromJSON(api_color$url)
+  df_pokemon_color <- pokemon_color$pokemon_species[1]
+  return(df_pokemon_color)
 }
+
+color_FUN("blue")
 ```
   pokemon_color <- fromJSON(api_color$url)
   df_pokemon_color <- pokemon_color$pokemon_species[1]
