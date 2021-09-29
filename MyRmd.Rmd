@@ -34,45 +34,97 @@ pokemon_evolve <- fromJSON(pokemondumpEVOLVE$url)
 pokemon_name <- fromJSON(pokemondumpNAME$url)
 
 id <- pokemon_evolve$chain$species$name
-name <- pokemon_name
-name
+id
 
+```
+```{r message=FALSE, warning=FALSE}
+pokemondumpBLUE <- GET("https://pokeapi.co/api/v2/pokemon-color/blue/")
+pokemon_blue <- fromJSON(pokemondumpBLUE$url)
 df_pokemon_blue <- pokemon_blue$pokemon_species[1]
 # Number of Blue Pokemon
 numb_blue <- nrow(df_pokemon_blue)
 numb_blue
 ```
+```{r message=FALSE, warning=FALSE}
+# Create a function to get the name of Pokemon of a certain color
+color_FUN <- function(color){  
+  if(color == "orange"){
+    color = "red"
+  }  # The API doesn't have 'orange', instead it classifies it as 'red'
+  base <- ("https://pokeapi.co/api/v2/pokemon-color/")
+  input <- color 
+  slash <- ("/")
+  api_color <- paste0(base, input, slash)
+  pokemondumpCOLOR <- GET(api_color)
+  pokemon_color <- fromJSON(pokemondumpCOLOR$url)
+  df_pokemon_color <- pokemon_color$pokemon_species[1]
+  return(df_pokemon_color)
+}
 
+color_FUN("orange")
+color_FUN("black")
+color_FUN("white")
+```
 
+NAME to ID
 
 ```{r message=FALSE, warning=FALSE}
-# Create a function to get the number of Pokemon of a certain color
-color_FUN <- function(color){  
-  base <- c("https://pokeapi.co/api/v2/pokemon-color/")
-  color <- c(color)  
-  slash <- c("/")
-  api_color <- paste0(base, color, slash)
-  pokemon_color <- fromJSON(api_color$url)
-  df_pokemon_color <- pokemon_color$pokemon_species[1]
-  return(df_pokemon_color)
-}
-
-color_FUN("blue")
-```
-  pokemon_color <- fromJSON(api_color$url)
-  df_pokemon_color <- pokemon_color$pokemon_species[1]
-  return(df_pokemon_color)
-  
-  
-  
-}
-
-test <- color_FUN(color = "blue")
-test
+#Trying to convert name to ID
+pokemondumpNAME2ID <- GET("https://pokeapi.co/api/v2/pokemon/dratini")
+pokemon_name2id <- fromJSON(pokemondumpNAME2ID$url)
+df_pokemon_name <- pokemon_name2id$id[1]
+df_pokemon_name
+#It worked!!!! Dratini is 147!!!! :)
 ```
 
-pokemon_
-## Pokemon data:
+Now, make it into a FUNction!!   Name to ID function
+
+```{r message=FALSE, warning=FALSE}
+
+# Create a function to convert Pokemon name to ID 
+ID_FUN <- function(poke_name){  
+  base <- ("https://pokeapi.co/api/v2/pokemon/")
+  input <- poke_name
+  slash <- ("/")
+  api_name <- paste0(base, input, slash)
+  pokemondumpNAME <- GET(api_name)
+  pokemon_name2id <- fromJSON(pokemondumpNAME$url)
+  df_pokemon_nameid <- pokemon_name2id$id
+  return(df_pokemon_nameid)
+}
+ID_FUN("dratini")
+```
+Now, let's go to further, and find out what it can evolves into
+```{r message=FALSE, warning=FALSE}
+
+EVOLVE_FUN <- function(poke_name){  
+  base <- ("https://pokeapi.co/api/v2/pokemon/")
+  input <- poke_name
+  slash <- ("/")
+  api_name <- paste0(base, input, slash)
+  pokemondumpNAME <- GET(api_name)
+  pokemon_name2id <- fromJSON(pokemondumpNAME$url)
+  df_pokemon_nameid <- pokemon_name2id$id  
+  ID <- as.character(df_pokemon_nameid) # First have to convert name into ID
+  ID
+  #Now put that into the Evolve API
+  base2 <- ("https://pokeapi.co/api/v2/pokemon/evolution-chain/")
+  api_evolve <- paste0(base2, ID, slash)
+  api_evolve
+  pokemondumpEVOLVE <- GET(api_evolve)
+  pokemon_evolve <- fromJSON(pokemondumpEVOLVE$url)
+  df_pokemon_evolve <- pokemon_evolve$chain$evolves_to
+  return(df_pokemon_evolve)
+}
+EVOLVE_FUN("dratini")
+```
+#Trying to convert name to ID
+pokemondumpNAME2ID <- GET("https://pokeapi.co/api/v2/pokemon/dratini")
+pokemon_name2id <- fromJSON(pokemondumpNAME2ID$url)
+df_pokemon_name <- pokemon_name2id$id[1]
+df_pokemon_name
+#It worked!!!! Dratini is 147!!!! :)
+
 
 Pokemon data: https://pokeapi.co/
 Render:
