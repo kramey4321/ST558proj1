@@ -25,6 +25,7 @@ pokemondumpMALE <- GET("https://pokeapi.co/api/v2/gender/male/")
 pokemondumpFEMALE <- GET("https://pokeapi.co/api/v2/gender/female/")
 pokemondumpEVOLVE <- GET("https://pokeapi.co/api/v2/evolution-chain/1/")
 pokemondumpNAME <- GET("https://pokeapi.co/api/v2/")
+pokemondumpSPECIES <- GET("https://pokeapi.co/api/v2/pokemon-species/147")
 
 # Try to make sense of what info is given
 pokemon_blue <- fromJSON(pokemondumpBLUE$url)
@@ -32,6 +33,11 @@ pokemon_male <- fromJSON(pokemondumpMALE$url)
 pokemon_female <- fromJSON(pokemondumpFEMALE$url)
 pokemon_evolve <- fromJSON(pokemondumpEVOLVE$url)
 pokemon_name <- fromJSON(pokemondumpNAME$url)
+pokemon_species <- fromJSON(pokemondumpSPECIES$url)
+
+df_pokemon_species <- pokemon_species$capture_rate
+TB_species <- as.tibble(df_pokemon_species)
+TB_species
 
 id <- pokemon_evolve$chain$species$name
 id
@@ -95,6 +101,79 @@ ID_FUN <- function(poke_name){
 ID_FUN("dratini")
 ID_FUN("squirtle")
 ```
+# Inside
+## Now to pull some info for Pokemon in the Kanto region (the first region 
+released in Pokemon Go).  A total of 151 Pokemon.
+```{r message=FALSE, warning=FALSE}
+df_speciesINFO <- data.frame()
+for (i in 1:151){
+  base2 <- ("https://pokeapi.co/api/v2/pokemon-species/")
+  ID = i
+  slash <- ("/")
+  api_species <- paste0(base2, ID, slash)
+  api_species
+  pokemondumpSPECIES <- GET(api_species)
+  pokemon_species <- fromJSON(pokemondumpSPECIES$url)
+  # Collecting some data
+  SpeciesINFO <- data.frame(as.character(pokemon_species$name[1]), as.numeric(pokemon_species$gender_rate[1]), as.numeric(pokemon_species$capture_rate[1]), as.numeric(pokemon_species$base_happiness[1]), as.logical(pokemon_species$is_legendary[1]), as.logical(pokemon_species$has_gender_differences))  
+  # Storing into a DF
+  df_speciesINFO <- rbind.data.frame(df_speciesINFO, SpeciesINFO)
+                                               
+}
+head(df_speciesINFO)
+# Changing Column names into something p'urty.
+names(df_speciesINFO) <- NULL
+names(df_speciesINFO) <- c("NAME", "GENDER_RATE", "CAPTURE_RATE", "BASE_HAPPINESS", "LEGENDARY?", "DIFFENT_GENDERS?")
+df_speciesINFO
+# Grouping Pokemon's Base Happiness into 4 levels
+df_speciesINFO <- df_speciesINFO %>%  
+  mutate(MOOD = if_else(BASE_HAPPINESS >= 100, "GLEEFUL",
+                        if_else(BASE_HAPPINESS >= 70, "CONTENT",
+                                if_else(BASE_HAPPINESS >= 10, "MEH", "PISSY"))))
+# Grouping Pokemon's Gender Rate
+df_speciesINFO <- df_speciesINFO %>%
+  mutate(MORE_LIKELY = if_else(GENDER_RATE > 4, "FEMALE",  
+                          if_else(GENDER_RATE < 4, "MALE", "50/50")))
+# Finding Average Capture Rate With each mood
+df_speciesINFO %>%
+  select(MOOD, CAPTURE_RATE) %>%  
+  group_by(MOOD) %>%  
+  mutate(AVG_CR = mean(CAPTURE_RATE))
+
+# Looking at Gender and Mood
+table(df_speciesINFO$MOOD, df_speciesINFO$MORE_LIKELY)
+
+# Happiness ranking
+
+h <- ggplot(data = df_speciesINFO, aes(x = MOOD))
+h + geom_histogram(stat = "count", fill = "blue")
+```
+
+```{r message=FALSE, warning=FALSE}
+
+EVOLVE_FUN <- function(poke_name){  
+  base <- ("https://pokeapi.co/api/v2/pokemon/")
+  input <- poke_name
+  slash <- ("/")
+  api_name <- paste0(base, input, slash)
+  pokemondumpNAME <- GET(api_name)
+  pokemon_name2id <- fromJSON(pokemondumpNAME$url)
+  df_pokemon_nameid <- pokemon_name2id$id  
+  ID <- as.character(df_pokemon_nameid) # First have to convert name into ID
+  ID
+  #Now put that into the Evolve API
+  base2 <- ("https://pokeapi.co/api/v2/evolution-chain/")
+  api_evolve <- paste0(base2, ID, slash)
+  api_evolve
+  pokemondumpEVOLVE <- GET(api_evolve)
+  pokemon_evolve <- fromJSON(pokemondumpEVOLVE$url)
+  df_pokemon_evolve <- pokemon_evolve$chain$evolves_to$species$name
+  EVOLVES <- as.character(df_pokemon_evolve)
+  return(EVOLVES)
+}
+EVOLVE_FUN("bulbasaur")
+```
+
 Now, let's go to further, and find out what it can evolves into
 ```{r message=FALSE, warning=FALSE}
 
@@ -121,34 +200,63 @@ EVOLVE_FUN <- function(poke_name){
 EVOLVE_FUN("bulbasaur")
 ```
 
-Trying to drum up some quantitative data
-https://pokeapi.co/api/v2/berry/{id or name}
-
+# Treat them like Family, feed them like Family.
+## How to pick the best berry bang for the buck.
 ```{r message=FALSE, warning=FALSE}
-# Berry Name and Max Size
 
-berry_FUN <- function(berry){  
+# How many berries are there?
+pokemondumpBERRYCOUNT <- GET("https://pokeapi.co/api/v2/berry/")
+pokemon_berrycount <- fromJSON(pokemondumpBERRYCOUNT$url)
+B <- as.numeric(data.frame(pokemon_berrycount$count)[1])
+B
+# Okay, 64, so now lets grab the name, size, max harvest, and growth time  
+# with a for loop
+df_BerryINFO <- data.frame()
+for (i in 1:B){
   base3 <- ("https://pokeapi.co/api/v2/berry/")
-  input <- berry
+  ID = i
+  slash <- ("/")
+  api_berry <- paste0(base3, ID, slash)
+  api_berry
+  pokemondumpBERRY <- GET(api_berry)
+  pokemon_berry <- fromJSON(pokemondumpBERRY$url)
+  # collecting what I want
+  BerryINFO <- data.frame(as.character((pokemon_berry$name)[1]),  
+                          as.numeric((pokemon_berry$size)[1]),  
+                          as.numeric((pokemon_berry$max_harvest)[1]),  
+                          as.numeric((pokemon_berry$growth_time)[1]))
+  # Storing into a DF
+  df_BerryINFO <- rbind.data.frame(df_BerryINFO, BerryINFO)
+}
+# Changing Column names to something pretty
+head(df_BerryINFO)
+names(df_BerryINFO) <- NULL
+head(df_BerryINFO) #Yay!  Now add them back in
+names(df_BerryINFO) <- c("NAME", "SIZE", "MAX_HARV", "GROWTH_TIME")
+head(df_BerryINFO)
+
+# FINALLY!  Time to graph! :)
+#Creating a scatterplot comparing the berry size with the berries max harvest
+g1 <- ggplot(data = df_BerryINFO, aes(x = GROWTH_TIME, y = SIZE))
+g1 + geom_point(position='jitter') + geom_smooth(method = lm, col = "Red")
+
+
+```
+
+pokemondumpBERRY <- GET("https://pokeapi.co/api/v2/berry/1")
+pokemon_berry_all <- fromJSON(pokemondumpBERRY$url)
+df_berry_all <- data.frame(pokemon_berry_all$name, pokemon_berry_all$size, pokemon_berry_all$max_harvest, pokemon_berry_all$growth_time, pokemon_berry_all$growth_time, pokemon_berry_all$natural_gift_power)
+df_berry_all
+
+input <- berry
   slash <- ("/")
   api_berry <- paste0(base3, input, slash)
   api_berry
   pokemondumpBERRY <- GET(api_berry)
   pokemon_berry <- fromJSON(pokemondumpBERRY$url)
   df_pokemon_berry <- data.frame(pokemon_berry$name, pokemon_berry$size, pokemon_berry$max_harvest)
-    return(df_pokemon_berry)
-}
 
-berry_FUN("3")
-df_berry <- data.frame()
-df_berry <- for(i in 1:10){
-  berry_FUN(i)
-}
-df_berry
 ```
-
-
-
 
 Pokemon data: https://pokeapi.co/
 Render:
