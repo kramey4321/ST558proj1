@@ -140,14 +140,18 @@ df_speciesINFO %>%
   group_by(MOOD) %>%  
   mutate(AVG_CR = mean(CAPTURE_RATE))
 
+# Mood Distribution
+h <- ggplot(data = df_speciesINFO, aes(x = MOOD))
+h + geom_histogram(stat = "count", fill = "blue")
+
 # Looking at Gender and Mood
 table(df_speciesINFO$MOOD, df_speciesINFO$MORE_LIKELY)
 
-# Happiness ranking
+h1 <- ggplot(data = df_speciesINFO, aes(x = MOOD, y = mean(CAPTURE_RATE)))
+h1 + geom_col()
 
-h <- ggplot(data = df_speciesINFO, aes(x = MOOD))
-h + geom_histogram(stat = "count", fill = "blue")
 ```
+
 
 ```{r message=FALSE, warning=FALSE}
 
