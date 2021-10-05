@@ -180,7 +180,6 @@ g + geom_histogram(binwidth = 10, color = "blue", fill = "red") + labs(title = "
 
 #Creating a scatterplot comparing the berry size with the berries' growth time
 g1 <- ggplot(data = df_BerryINFO, aes(x = GROWTH_TIME, y = SIZE))
-g1 
 g1 + geom_point(size = 4, alpha = .4, color = "blue", position='jitter') + geom_smooth(method = lm, col = "red") + labs(title = "Scatterplot Comparing Time with Size of Berry")
 ```
   
