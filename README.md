@@ -225,7 +225,7 @@ g <- ggplot(df_BerryINFO, aes(x  = SIZE))
 g + geom_histogram(binwidth = 10, color = "blue", fill = "red") + labs(title = "Histogram of Berry Size")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> \#\#\#\# The
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- --> \#\#\#\# The
 Berry Histogram shows that there is a wide range of sizes, but the bulk
 are under 100. So how does size compare to growth time?
 
@@ -235,7 +235,7 @@ g1 <- ggplot(data = df_BerryINFO, aes(x = GROWTH_TIME, y = SIZE))
 g1 + geom_point(size = 4, alpha = .4, color = "blue", position='jitter') + geom_smooth(method = lm, col = "red") + labs(title = "Scatterplot Comparing Time with Size of Berry")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 #### Okay, well, that only showed that there’s practically no correlation between growth time and size. But let’s go further, by making bins out of these numbers!
 
@@ -251,7 +251,7 @@ g2 + geom_boxplot(fill = "white") + geom_jitter(aes(color = BERRY_SIZE)) +
   labs(title = "Boxplot for Growth Time")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 #### So, it looks like large berries aren’t as prevelant, they have the smallest IQR. I’m surprised to see that the median growth time for the medium berries are lower than for the small berries…Interesting…
 
@@ -413,7 +413,7 @@ h1 + geom_histogram(stat = "count", fill = "blue") +
   labs(title = "Distribution of Mood")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 #### Looks like majority of Pokemon are content with life.
 
@@ -437,7 +437,7 @@ h1 + geom_bar(aes(fill = CATCH), position = "dodge") +
  coord_flip() + labs(title = "Mood Versus Catch-ability")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 #### I thought perhaps the happier the Pokemon are, the easier they are to catch, but based on the histogram, sure doesn’t look that way. How in the world can a Pokemon be Gleeful and yet Impossible to catch…maybe that’s why they are gleeful.
 
@@ -464,12 +464,10 @@ h1 + geom_bar(aes(fill = MORE_LIKELY), position = "dodge") +
   labs(title = "Mood versus Catch-ability, grouped by Gender")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 #### Well, there you have it. You now will be a color-coordinated trainer. You know how easily your new bestie will be to catch. And you have the best knowledge of how to keep your Pokemon happy and well fed.
 
 <p align="center">
-
-### QED
-
+QED
 </p>

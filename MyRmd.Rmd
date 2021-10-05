@@ -356,7 +356,7 @@ h1 + geom_bar(aes(fill = MORE_LIKELY), position = "dodge") +
   
 #### Well, there you have it.  You now will be a color-coordinated trainer.  You know how easily your new bestie will be to catch.  And you have the best knowledge of how to keep your Pokemon happy and well fed.
 <p align = "center">
-### QED
+QED
 </p>
 
 
